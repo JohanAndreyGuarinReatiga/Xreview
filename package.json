@@ -1,0 +1,32 @@
+{
+  "name": "xreview",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "initdb": "node ./config/initDB.js",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JohanAndreyGuarinReatiga/Xreview.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.18.0",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1"
+  },
+  "bugs": {
+    "url": "https://github.com/JohanAndreyGuarinReatiga/Xreview/issues"
+  },
+  "homepage": "https://github.com/JohanAndreyGuarinReatiga/Xreview#readme"
+}
