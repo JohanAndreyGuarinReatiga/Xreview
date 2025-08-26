@@ -35,4 +35,20 @@ export class ServicioResenias {
     } finally {
       await session.endSession();
     } }
+
+    static async editarResenia(reseniaId, usuarioId, updates) {
+    const resenia = await getDb().collection("resenias").findOne({ _id: new ObjectId(reseniaId) });
+    if (!resenia) throw new Error("Reseña no encontrada");
+    if (!resenia.usuarioId.equals(usuarioId)) throw new Error("No autorizado");
+
+    const { encabezado, comentario, calificacion } = updates;
+
+    await getDb().collection("resenias").updateOne(
+      { _id: new ObjectId(reseniaId) },
+      { $set: { encabezado, comentario, calificacion } }
+    );
+
+    return { _id: reseniaId, ...updates };
+  }
+
 }
