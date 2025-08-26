@@ -30,14 +30,4 @@ async function applySchemas() {
   }
 }
 
-(async () => {
-  try {
-    await connect();
-    await applySchemas();
-    console.log("🎉 Esquemas aplicados correctamente!");
-    process.exit(0);
-  } catch (err) {
-    console.error("❌ Error inicializando la DB:", err);
-    process.exit(1);
-  }
-})();
+export { applySchemas };
