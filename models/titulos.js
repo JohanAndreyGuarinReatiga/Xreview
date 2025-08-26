@@ -7,9 +7,11 @@ export class Titulo {
     descripcion,
     categoria,
     anio,
-    aprobado,
+    imagenUrl = null,
+    aprobado = false,
     creadoPor,
-    creadoEn,
+    creadoEn = new Date(),
+    estadisticas = {},
   }) {
     if (!titulo || typeof titulo !== "string") {
       throw new Error("El titulo debe ser una cadena");
