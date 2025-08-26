@@ -3,10 +3,11 @@ import { bcrypt } from "bcrypt";
 
 export class Usuario {
   constructor({ email, contraseña, apodo, rol }) {
+    // Validaciones
+
     if (!email || !/^.+@.+\..+$/.test(email)) {
       throw new Error(
-        "El email es obligatorio y debe tener un formato valido."
-      );
+        "El email es obligatorio y debe tener un formato valido.");
     }
 
     if (!contraseña || typeof contraseña !== "string") {
@@ -21,6 +22,7 @@ export class Usuario {
       throw new Error("El rol debe ser 'usuario' o 'admin'.");
     }
 
+    // Asignación de valores
     this._id = new ObjectId();
     this.email = email;
     this.contraseña = this.hashPassword(contraseña);
@@ -36,6 +38,7 @@ export class Usuario {
     return bcrypt.compareSync(contraseña, this.c);
   }
 
+  // Conversión a objeto para MongoDB
   toDBObject() {
     return {
       _id: this._id,

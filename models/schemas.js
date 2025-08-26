@@ -97,58 +97,58 @@ export default {
         },
       },
     },
+  },
 
-    resenia: {
-      $jsonSchema: {
-        bsonType: "object",
-        required: [
-          "tituloId",
-          "usuarioId",
-          "encabezado",
-          "comentario",
-          "calificacion",
-        ],
-        properties: {
-          tituloId: {
+  resenia: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: [
+        "tituloId",
+        "usuarioId",
+        "encabezado",
+        "comentario",
+        "calificacion",
+      ],
+      properties: {
+        tituloId: {
+          bsonType: "objectId",
+          description: "Referencia al título reseñado",
+        },
+        usuarioId: {
+          bsonType: "objectId",
+          description: "ID del usuario que hizo la reseña",
+        },
+        encabezado: {
+          bsonType: "string",
+          description: "Título breve de la reseña",
+          maxLength: 100,
+        },
+        comentario: {
+          bsonType: "string",
+          description: "Texto completo de la reseña",
+          maxLength: 1000,
+        },
+        calificacion: {
+          bsonType: "int",
+          minimum: 1,
+          maximum: 10,
+          description: "Puntuación del 1 al 10",
+        },
+        meGusta: {
+          bsonType: "array",
+          description: "IDs de usuarios que dieron like",
+          items: {
             bsonType: "objectId",
-            description: "Referencia al título reseñado",
           },
-          usuarioId: {
+          uniqueItems: true,
+        },
+        noMeGusta: {
+          bsonType: "array",
+          description: "IDs de usuarios que dieron dislike",
+          items: {
             bsonType: "objectId",
-            description: "ID del usuario que hizo la reseña",
           },
-          encabezado: {
-            bsonType: "string",
-            description: "Título breve de la reseña",
-            maxLength: 100,
-          },
-          comentario: {
-            bsonType: "string",
-            description: "Texto completo de la reseña",
-            maxLength: 1000,
-          },
-          calificacion: {
-            bsonType: "int",
-            minimum: 1,
-            maximum: 10,
-            description: "Puntuación del 1 al 10",
-          },
-          meGusta: {
-            bsonType: "array",
-            description: "IDs de usuarios que dieron like",
-            items: {
-              bsonType: "objectId",
-            },
-            uniqueItems: true,
-          },
-          noMeGusta: {
-            bsonType: "array",
-            description: "IDs de usuarios que dieron dislike",
-            items: {
-              bsonType: "objectId",
-            },
-            uniqueItems: true,
-          },
+          uniqueItems: true,
         },
       },
     },
