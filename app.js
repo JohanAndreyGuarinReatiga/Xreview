@@ -1,19 +1,21 @@
-// app.js
 import express from "express";
+import cors from "cors";
+import rateLimit from "express-rate-limit";
+import router from "./routes/index.js";
 
 const app = express();
 
-// Middlewares básicos
-app.use(express.json()); // Para recibir JSON en requests
-app.use(express.urlencoded({ extended: true })); // Para recibir datos de formularios
+app.use(cors());
+app.use(express.json());
 
-// Rutas de ejemplo
-app.get("/", (req, res) => {
-  res.send("🚀 API funcionando sin CORS");
+//  limit global
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100,
 });
+app.use(limiter);
 
-// Aquí luego importarás tus rutas:
-// import userRoutes from "./routes/users.js";
-// app.use("/users", userRoutes);
+// montar rutas versionadas
+app.use(router);
 
 export default app;
