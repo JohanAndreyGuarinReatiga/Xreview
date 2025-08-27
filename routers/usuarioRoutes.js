@@ -1,13 +1,16 @@
-// routes/usuarioRoutes.js
 import { Router } from "express";
 import passport from "passport";
-import { listar, eliminar } from "../controllers/usuarioController.js";
+import { listarUsuario, eliminarUsuario } from "../controllers/usuarioController.js";
+import { esAdmin } from "../middlewares/roles.js";
 
 const router = Router();
 
 // Ruta protegida con Passport-JWT
 // Sirve para devolver los datos del usuario que está logueado actualmente, usando el token como prueba de identidad
-router.get("/profile",passport.authenticate("jwt", { session: false }),(req, res) => {
+router.get(
+  "/profile",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
     res.json({
       mensaje: "Perfil del usuario",
       user: {
@@ -21,8 +24,19 @@ router.get("/profile",passport.authenticate("jwt", { session: false }),(req, res
 );
 
 // Listar usuarios
-router.get("/listar", listar);
+router.get(
+  "/listar",
+  passport.authenticate("jwt", { session: false }),
+  esAdmin,
+  listarUsuario
+);
+
 // Eliminar usuario
-router.delete("/eliminar/:id", eliminar);
+router.delete(
+  "/eliminar/:id",
+  passport.authenticate("jwt", { session: false }),
+  esAdmin,
+  eliminarUsuario
+);
 
 export default router;

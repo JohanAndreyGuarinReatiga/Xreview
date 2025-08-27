@@ -16,7 +16,7 @@ app.use(passport.initialize());
 configurePassport(passport);
 
 // Rutas
-app.use("/auth", authRoutes);
-app.use("/usuarios", usuarioRoutes);
+app.use("/v1/auth", authRoutes);
+app.use("/v1/usuarios", usuarioRoutes);
 
 export default app;
