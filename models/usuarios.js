@@ -17,8 +17,8 @@ export class Usuario {
       throw new Error("El apodo debe ser una cadena de texto.");
     }
 
-    if (!["usuario", "admin"].includes(rol)) {
-      throw new Error("El rol debe ser 'usuario' o 'admin'.");
+    if (!["usuario", "administrador"].includes(rol)) {
+      throw new Error("El rol debe ser 'usuario' o 'administrador'.");
     }
 
     // Asignación de valores

@@ -10,12 +10,14 @@ export class usuarioServicio {
   }
 
   // Crear usuario
-  async registrarUsarios(datos) {
+  async registrarUsuarios(datos) {
     const usuario = new Usuario(datos);
 
     //verifivar si ya existe el correo
     const existente = await this.collection().findOne({ email: usuario.email });
     if (existente) throw new Error("El correo ya esta registrado");
+
+    usuario.contraseña = await bcrypt.hash(usuario.contraseña, 10);
 
     await this.collection().insertOne(usuario.toDBObject());
     return { mensaje: "Usuario registrado con exito", usuarioId: usuario._id };
@@ -47,7 +49,33 @@ export class usuarioServicio {
 
   async eliminar(id) {
     const res = await this.collection().deleteOne({ _id: new ObjectId(id) });
-    if (res.deleteCount === 0) throw new Error("Usuario no encontrado");
+    if (res.deletedCount === 0) throw new Error("Usuario no encontrado");
     return { mensaje: "Usuario eliminado" };
+  }
+
+  async editar(id, datos, usuarioAutenticado) {
+    // Si no es admin, solo puede editar su propio perfil
+    if (
+      usuarioAutenticado.rol !== "administrador" &&
+      usuarioAutenticado.id !== id
+    ) {
+      throw new Error("No tienes permiso para editar este usuario");
+    }
+
+    const updates = { ...datos };
+
+    // Si hay nueva contraseña hashearla
+    if (updates.contraseña) {
+      updates.contraseña = await bcrypt.hash(updates.contraseña, 10);
+    }
+
+    const res = await this.collection().updateOne(
+      { _id: new ObjectId(id) },
+      { $set: updates }
+    );
+
+    if (res.matchedCount === 0) throw new Error("Usuario no encontrado");
+
+    return { mensaje: "Usuario actualizado con éxito" };
   }
 }
