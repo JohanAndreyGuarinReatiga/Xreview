@@ -1,21 +1,22 @@
 import express from "express";
-import cors from "cors";
-import rateLimit from "express-rate-limit";
-import router from "./routers/index.js";
+import passport from "passport";
+import dotenv from "dotenv";
+import { configurePassport } from "./config/passport.js";
+
+import authRoutes from "./routers/authRoutes.js";
+import usuarioRoutes from "./routers/usuarioRoutes.js";
+
+dotenv.config();
 
 const app = express();
-
-app.use(cors());
 app.use(express.json());
 
-//  limit global
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100,
-});
-app.use(limiter);
+// Inicializar passport
+app.use(passport.initialize());
+configurePassport(passport);
 
-// montar rutas versionadas
-app.use(router);
+// Rutas
+app.use("/auth", authRoutes);
+app.use("/usuarios", usuarioRoutes);
 
 export default app;

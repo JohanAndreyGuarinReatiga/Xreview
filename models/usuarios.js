@@ -1,13 +1,12 @@
 import { ObjectId } from "mongodb";
-import { bcrypt } from "bcrypt";
+import  bcrypt  from "bcrypt";
 
 export class Usuario {
   constructor({ email, contraseña, apodo, rol }) {
     // Validaciones
 
     if (!email || !/^.+@.+\..+$/.test(email)) {
-      throw new Error(
-        "El email es obligatorio y debe tener un formato valido.");
+      throw new Error("El email es obligatorio y debe tener un formato valido.");
     }
 
     if (!contraseña || typeof contraseña !== "string") {
@@ -35,7 +34,7 @@ export class Usuario {
   }
 
   validarPassword(contraseña) {
-    return bcrypt.compareSync(contraseña, this.c);
+    return bcrypt.compareSync(contraseña, this.contraseña);
   }
 
   // Conversión a objeto para MongoDB
