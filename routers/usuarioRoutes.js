@@ -1,6 +1,10 @@
 import { Router } from "express";
 import passport from "passport";
-import { listarUsuario, eliminarUsuario } from "../controllers/usuarioController.js";
+import {
+  listarUsuario,
+  eliminarUsuario,
+  editarUsuario,
+} from "../controllers/usuarioController.js";
 import { esAdmin } from "../middlewares/roles.js";
 
 const router = Router();
@@ -37,6 +41,13 @@ router.delete(
   passport.authenticate("jwt", { session: false }),
   esAdmin,
   eliminarUsuario
+);
+
+// Editar usuario (propio o admin)
+router.put(
+  "/editar/:id",
+  passport.authenticate("jwt", { session: false }),
+  editarUsuario
 );
 
 export default router;

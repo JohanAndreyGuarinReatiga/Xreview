@@ -52,4 +52,30 @@ export class usuarioServicio {
     if (res.deletedCount === 0) throw new Error("Usuario no encontrado");
     return { mensaje: "Usuario eliminado" };
   }
+
+  async editar(id, datos, usuarioAutenticado) {
+    // Si no es admin, solo puede editar su propio perfil
+    if (
+      usuarioAutenticado.rol !== "administrador" &&
+      usuarioAutenticado.id !== id
+    ) {
+      throw new Error("No tienes permiso para editar este usuario");
+    }
+
+    const updates = { ...datos };
+
+    // Si hay nueva contraseña hashearla
+    if (updates.contraseña) {
+      updates.contraseña = await bcrypt.hash(updates.contraseña, 10);
+    }
+
+    const res = await this.collection().updateOne(
+      { _id: new ObjectId(id) },
+      { $set: updates }
+    );
+
+    if (res.matchedCount === 0) throw new Error("Usuario no encontrado");
+
+    return { mensaje: "Usuario actualizado con éxito" };
+  }
 }
