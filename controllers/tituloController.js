@@ -25,8 +25,8 @@ export async function listarTitulos(req, res) {
 
 export async function obtenerTitulo(req, res) {
   try {
-    const {titulo} = req.params;
-    const servicio = new tituloServicio
+    const { titulo } = req.params;
+    const servicio = new tituloServicio();
     const resultado = await servicio.buscaPorNombre(titulo);
     res.json(resultado);
   } catch (error) {
@@ -60,4 +60,3 @@ export async function aprobarTitulo(req, res) {
     res.status(403).json({ error: error.message });
   }
 }
-

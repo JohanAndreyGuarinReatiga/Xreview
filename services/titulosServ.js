@@ -1,3 +1,4 @@
+import { text } from "express";
 import { getDB } from "../config/configdb.js";
 import { Titulo } from "../models/titulos.js";
 import { ObjectId } from "mongodb";
@@ -75,5 +76,73 @@ export class tituloServicio {
     if (res.matchedCount === 0) throw new Error("Título no encontrado");
 
     return { mensaje: "Título aprobado con éxito" };
+  }
+//******************************//
+  async listarConFiltros(filtros = {}) {
+    const query = {};
+    if (filtros.tipo) query.tipo = filtros.tipo;
+    if (filtros.categoria) query.categoria = filtros.categoria;
+    if (filtros.anio) query.anio = parseInt(filtros.anio);
+    if (filtros.aprobado !== undefined) query.aprobado = filtros.aprobado;
+
+    return await this.collection().find(query).toArray();
+  }
+
+  async listarPaginado({ page = 1, limit = 10, sortBy = "anio", order = -1 }) {
+    return await this.collection()
+      .find()
+      .sort({ [sortBy]: order })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .toArray();
+  }
+
+  async actualizarEstadisticas(
+    id,
+    { meGusta = 0, noMeGusta = 0, calificacion = null }
+  ) {
+    const update = {};
+
+    if (meGusta) update["estadisticas.meGusta"] = meGusta;
+    if (noMeGusta) update["estadisticas.noMeGusta"] = noMeGusta;
+
+    if (calificacion !== null) {
+      update["estadisticas.promedioCalificacion"] = calificacion;
+      update["estadisticas.totalResenas"] = 1;
+    }
+
+    const res = await this.collection().updateOne(
+      { _id: new ObjectId(id) },
+      { $inc: update }
+    );
+
+    if (res.matchedCount === 0) throw new Error("Titulo no encontrado");
+    return { mensaje: "Estadisticas actualizadas" };
+  }
+
+  async buscarPorTexto(query) {
+    return await this.collection().find({ $text: { $search: query } }).toArray;
+  }
+
+  async listarTopRanking(limit = 10) {
+    return await this.collection()
+      .find({ aprobado: true })
+      .sort({ "estadisticas.ranking": -1 })
+      .limit(limit)
+      .toArray();
+  }
+
+  async listarMasGustados(limit = 10) {
+    return await this.collection()
+      .find({ aprobado: true })
+      .sort({ "estadisticas.meGusta": -1 })
+      .limit(limit)
+      .toArray();
+  }
+
+  async listarPorUsuarios(usuarioId) {
+    return await this.collection()
+    .find({creadoPor: new ObjectId(usuarioId)})
+    .toArray()
   }
 }
