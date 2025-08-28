@@ -5,10 +5,12 @@ import { configurePassport } from "./config/passport.js";
 import authRoutes from "./routers/authRoutes.js";
 import usuarioRoutes from "./routers/usuarioRoutes.js";
 import reseniaRouter from "./routers/v1/reseniaRouter.js"
+import cors from "cors";
 
 dotenv.config();
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 // Inicializar passport
