@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import { configurePassport } from "./config/passport.js";
 import authRoutes from "./routers/authRoutes.js";
 import usuarioRoutes from "./routers/usuarioRoutes.js";
-import reseniaRouter from "./routers/v1/reseniaRouter.js"
+import reseniaRouter from "./routers/reseniaRouter.js"
 import cors from "cors";
 
 dotenv.config();
@@ -20,6 +20,6 @@ configurePassport(passport);
 // Rutas
 app.use("/v1/auth", authRoutes);
 app.use("/v1/usuarios", usuarioRoutes);
-app.use("/resenias", reseniaRouter)
+app.use("/v1/resenias", reseniaRouter)
 
 export default app;

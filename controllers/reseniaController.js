@@ -4,7 +4,10 @@ import { ObjectId } from "mongodb";
 
 export const crearReseniaCtrl = async (req, res) => {
   try {
-    const data = req.body;
+    const data = {
+      ...req.body,
+      usuarioId: new ObjectId(req.user._id), // ingreso del id limpio
+    };
     const result = await ServicioResenias.crearResenia(data);
     return exitosoResponse(res, result, "Reseña creada exitosamente");
   } catch (error) {

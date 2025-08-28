@@ -10,7 +10,6 @@ export class ServicioResenias {
 
     // Conversión estricta de ObjectId
     data.tituloId = new ObjectId(data.tituloId);
-    data.usuarioId = new ObjectId(data.usuarioId);
 
     // Asegurar arrays
     data.meGusta = Array.isArray(data.meGusta)
@@ -74,7 +73,7 @@ export class ServicioResenias {
     const _id = new ObjectId(reseniaId);
   
     // Buscar reseña del usuario
-    const reseniaExistente = await coleccion.findOne({ _id, usuarioId });
+    const reseniaExistente = await coleccion.findOne({ _id, usuarioId: new ObjectId(usuarioId) });
     if (!reseniaExistente) {
       throw new Error("Reseña no encontrada o no tienes permisos");
     }
