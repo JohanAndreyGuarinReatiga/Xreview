@@ -15,7 +15,7 @@ app.use(express.json());
 
 // Inicializar passport
 app.use(passport.initialize());
-// configurePassport(passport);
+configurePassport(passport);
 
 // Rutas
 app.use("/v1/auth", authRoutes);
