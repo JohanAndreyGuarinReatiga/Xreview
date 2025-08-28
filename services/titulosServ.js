@@ -1,4 +1,3 @@
-import { text } from "express";
 import { getDB } from "../config/configdb.js";
 import { Titulo } from "../models/titulos.js";
 import { ObjectId } from "mongodb";
@@ -18,17 +17,19 @@ export class tituloServicio {
   async listar() {
     let filtro = { aprobado: true };
 
-    if (usuarioAutenticado && usuarioAutenticado.rol === "administrador") {
+    if (usuarioAutenticado?.rol === "administrador") {
       filtro = {};
     }
 
     return await this.collection().find(filtro).toArray();
   }
 
-  async buscaPorNombre(titulo) {
-    const busqueda = await this.collection().find({
-      titulo: { $regex: new RegExp(titulo, "i") },
-    });
+  async buscarPorNombre(titulo) {
+    const busqueda = await this.collection()
+      .find({
+        titulo: { $regex: new RegExp(titulo, "i") },
+      })
+      .toArray();
 
     if (!busqueda) throw new Error("Titulo no encontrado.");
     return busqueda;
@@ -77,8 +78,8 @@ export class tituloServicio {
 
     return { mensaje: "Título aprobado con éxito" };
   }
-//******************************//
-  async listarConFiltros(filtros = {}) {
+  
+  async filtrado(filtros = {}) {
     const query = {};
     if (filtros.tipo) query.tipo = filtros.tipo;
     if (filtros.categoria) query.categoria = filtros.categoria;
@@ -106,14 +107,18 @@ export class tituloServicio {
     if (meGusta) update["estadisticas.meGusta"] = meGusta;
     if (noMeGusta) update["estadisticas.noMeGusta"] = noMeGusta;
 
+    const setUpdate = {};
     if (calificacion !== null) {
-      update["estadisticas.promedioCalificacion"] = calificacion;
-      update["estadisticas.totalResenas"] = 1;
+      setUpdate["estadisticas.promedioCalificacion"] = calificacion;
+      setUpdate["estadisticas.totalResenas"] = 1;
     }
 
     const res = await this.collection().updateOne(
       { _id: new ObjectId(id) },
-      { $inc: update }
+      {
+        ...ObjectId(Object.keys(update).length && { $inc: update }),
+        ...ObjectId(Object.keys(setUpdate).length && { $set: setUpdate }),
+      }
     );
 
     if (res.matchedCount === 0) throw new Error("Titulo no encontrado");
@@ -121,7 +126,9 @@ export class tituloServicio {
   }
 
   async buscarPorTexto(query) {
-    return await this.collection().find({ $text: { $search: query } }).toArray;
+    return await this.collection()
+      .find({ $text: { $search: query } })
+      .toArray();
   }
 
   async listarTopRanking(limit = 10) {
@@ -140,9 +147,9 @@ export class tituloServicio {
       .toArray();
   }
 
-  async listarPorUsuarios(usuarioId) {
+  async listarPorUsuario(usuarioId) {
     return await this.collection()
-    .find({creadoPor: new ObjectId(usuarioId)})
-    .toArray()
+      .find({ creadoPor: new ObjectId(usuarioId) })
+      .toArray();
   }
 }

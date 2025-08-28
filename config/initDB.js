@@ -28,6 +28,16 @@ async function applySchemas() {
       }
     }
   }
+
+  try {
+     await db.collection("titulos").createIndex(
+      {titulo: "text", descripcion: "text"},
+      { name: "TextoIndexTitulos" }
+     )
+     console.log("📌 Índice de texto creado en 'titulos'");
+  } catch (error) {
+    console.error("⚠️ Error creando índices en 'titulos':", error);
+  }
 }
 
 export { applySchemas };
