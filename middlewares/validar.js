@@ -13,11 +13,11 @@ export const validarCampos = (req, res, next) => {
 
 export const validarRegistro = [
   body("email").isEmail().withMessage("El email no es valido."),
-  body("contraseña").isLength({min:4}).withMessage("La contraseña debe tener al menos 4 caracteres."),
+  body("password").isLength({min:2}).withMessage("La password debe tener al menos 2 caracteres."),
   body("apodo").notEmpty().withMessage("El apodo es obligatorio")
 ]
 
 export const validarLogin = [
   body("email").isEmail().withMessage("El email no es valido"),
-  body("contraseña").notEmpty().withMessage("La contraseña es obligatoria")
+  body("password").notEmpty().withMessage("La password es obligatoria")
 ]

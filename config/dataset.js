@@ -10,16 +10,16 @@ async function seed() {
     {
       _id: new ObjectId("66d07a1f4b2f4d3f9f1a1111"),
       email: "juan@example.com",
-      contraseña: "1234",
+      password: "1234",
       apodo: "Juanito",
       rol: "usuario",
     },
     {
       _id: new ObjectId("66d07a1f4b2f4d3f9f1a2222"),
       email: "admin@example.com",
-      contraseña: "1234",
+      password: "1234",
       apodo: "AdminMaster",
-      rol: "administrador", // ✅ corregido (antes "admin")
+      rol: "administrador",
     },
   ];
 
@@ -31,7 +31,7 @@ async function seed() {
       tipo: "pelicula",
       descripcion:
         "Un ladrón que roba secretos corporativos a través de los sueños debe implantar una idea en la mente de un CEO.",
-      categoria: "Ficción", // ✅ corregido (antes "Ciencia")
+      categoria: "Ficción", 
       anio: new Int32(2010),
       imagenUrl:
         "https://res.cloudinary.com/demo/image/upload/v1692999999/inception.jpg",

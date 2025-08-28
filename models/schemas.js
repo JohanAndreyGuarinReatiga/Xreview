@@ -2,16 +2,16 @@ export default {
   usuarios: {
     $jsonSchema: {
       bsonType: "object",
-      required: ["email", "contraseña", "apodo", "rol"],
+      required: ["email", "password", "apodo", "rol"],
       properties: {
         email: {
           bsonType: "string",
           description: "Correo electrónico del usuario",
           pattern: "^\\S+@\\S+\\.\\S+$",
         },
-        contraseña: {
+        password: {
           bsonType: "string",
-          description: "Contraseña encriptada con bcrypt",
+          description: "password encriptada con bcrypt",
         },
         apodo: {
           bsonType: "string",

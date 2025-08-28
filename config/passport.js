@@ -1,6 +1,6 @@
 // config/passport.js
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
-import { getDB } from "./configdb.js";   // OJO: en tu estructura ya tienes configdb.js
+import { getDB } from "./configdb.js";   
 import dotenv from "dotenv";
 import { ObjectId } from "mongodb";
 
