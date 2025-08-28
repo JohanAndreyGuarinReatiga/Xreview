@@ -17,17 +17,17 @@ export class usuarioServicio {
     const existente = await this.collection().findOne({ email: usuario.email });
     if (existente) throw new Error("El correo ya esta registrado");
 
-    usuario.contraseña = await bcrypt.hash(usuario.contraseña, 10);
+    //usuario.password = await bcrypt.hash(usuario.password, 10);
 
     await this.collection().insertOne(usuario.toDBObject());
     return { mensaje: "Usuario registrado con exito", usuarioId: usuario._id };
   }
 
-  async login(email, contraseña) {
+  async login(email, password) {
     const usuario = await this.collection().findOne({ email });
     if (!usuario) throw new Error("Credenciales invalidas");
 
-    const valido = bcrypt.compareSync(contraseña, usuario.contraseña);
+    const valido = bcrypt.compareSync(password, usuario.password);
     if (!valido) throw new Error("Credenciales invalidas");
 
     const token = jwt.sign(
@@ -44,7 +44,7 @@ export class usuarioServicio {
   }
 
   async listar() {
-    return await this.collection().find().project({ contraseña: 0 }).toArray();
+    return await this.collection().find().project({ password: 0 }).toArray();
   }
 
   async eliminar(id) {
@@ -64,9 +64,9 @@ export class usuarioServicio {
 
     const updates = { ...datos };
 
-    // Si hay nueva contraseña hashearla
-    if (updates.contraseña) {
-      updates.contraseña = await bcrypt.hash(updates.contraseña, 10);
+    // Si hay nueva password hashearla
+    if (updates.password) {
+      updates.password = await bcrypt.hash(updates.password, 10);
     }
 
     const res = await this.collection().updateOne(

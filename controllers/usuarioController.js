@@ -13,8 +13,8 @@ export async function registrar(req, res) {
 
 export async function login(req, res) {
   try {
-    const { email, contraseña } = req.body;
-    const resultado = await servicio.login(email, contraseña);
+    const { email, password } = req.body;
+    const resultado = await servicio.login(email, password);
     res.json(resultado);
   } catch (err) {
     res.status(401).json({ error: err.message });

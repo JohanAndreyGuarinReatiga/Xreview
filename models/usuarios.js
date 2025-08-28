@@ -2,15 +2,15 @@ import { ObjectId } from "mongodb";
 import  bcrypt  from "bcrypt";
 
 export class Usuario {
-  constructor({ email, contraseña, apodo, rol }) {
+  constructor({ email, password, apodo, rol }) {
     // Validaciones
 
     if (!email || !/^.+@.+\..+$/.test(email)) {
       throw new Error("El email es obligatorio y debe tener un formato valido.");
     }
 
-    if (!contraseña || typeof contraseña !== "string") {
-      throw new Error("La contraseña es obligatoria.");
+    if (!password || typeof password !== "string") {
+      throw new Error("La password es obligatoria.");
     }
 
     if (!apodo || typeof apodo !== "string") {
@@ -24,17 +24,17 @@ export class Usuario {
     // Asignación de valores
     this._id = new ObjectId();
     this.email = email;
-    this.contraseña = this.hashPassword(contraseña);
+    this.password = this.hashPassword(password);
     this.apodo = apodo;
     this.rol = rol;
   }
 
-  hashPassword(contraseña) {
-    return bcrypt.hashSync(contraseña, 10);
+  hashPassword(password) {
+    return bcrypt.hashSync(password, 10);
   }
 
-  validarPassword(contraseña) {
-    return bcrypt.compareSync(contraseña, this.contraseña);
+  validarPassword(password) {
+    return bcrypt.compareSync(password, this.password);
   }
 
   // Conversión a objeto para MongoDB
@@ -42,7 +42,7 @@ export class Usuario {
     return {
       _id: this._id,
       email: this.email,
-      contraseña: this.contraseña,
+      password: this.password,
       apodo: this.apodo,
       rol: this.rol,
     };
