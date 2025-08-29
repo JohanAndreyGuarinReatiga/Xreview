@@ -1,6 +1,7 @@
 import { getDB } from "../config/configdb.js";
 import { Resenia } from "../models/Resenia.js";
 import { ObjectId } from "mongodb";
+import { Int32, Double } from "mongodb"; 
 
 export class ServicioResenias {
   static async crearResenia(data) {
@@ -155,46 +156,85 @@ export class ServicioResenias {
   
     return { success: true };
   }
-  
-  static async likeResenia(reseniaId, usuarioId) {
-    if (!ObjectId.isValid(reseniaId)) throw new Error("ID de reseña inválido");
-  
+
+ static async likeResenia(reseniaId, usuarioId) {
+    if (!ObjectId.isValid(reseniaId)) throw new Error("ID inválido");
+
     const db = getDB();
-  
-    // Asegurar que la reseña existe
-    const reseña = await db.collection("resenia").findOne({ _id: new ObjectId(reseniaId) });
-    if (!reseña) throw new Error("Reseña no encontrada");
-  
-    // Agregar usuario a meGusta, eliminar de noMeGusta
+    const resenia = await db.collection("resenia").findOne({ _id: new ObjectId(reseniaId) });
+    if (!resenia) throw new Error("Reseña no encontrada");
+
+    // Remover dislike si existe y agregar like
     await db.collection("resenia").updateOne(
       { _id: new ObjectId(reseniaId) },
       {
-        $addToSet: { meGusta: new ObjectId(usuarioId) }, // evita duplicados
-        $pull: { noMeGusta: new ObjectId(usuarioId) }
+        $addToSet: { meGusta: usuarioId },
+        $pull: { noMeGusta: usuarioId }
       }
     );
-  
-    return { success: true, action: "like" };
+
+    // Recalcular estadísticas del título
+    await this._actualizarEstadisticasTitulo(resenia.tituloId);
+
+    return { success: true };
   }
-  
+
   static async dislikeResenia(reseniaId, usuarioId) {
-    if (!ObjectId.isValid(reseniaId)) throw new Error("ID de reseña inválido");
-  
+    if (!ObjectId.isValid(reseniaId)) throw new Error("ID inválido");
+
     const db = getDB();
-  
-    const reseña = await db.collection("resenia").findOne({ _id: new ObjectId(reseniaId) });
-    if (!reseña) throw new Error("Reseña no encontrada");
-  
-    // Agregar usuario a noMeGusta, eliminar de meGusta
+    const resenia = await db.collection("resenia").findOne({ _id: new ObjectId(reseniaId) });
+    if (!resenia) throw new Error("Reseña no encontrada");
+
+    // Remover like si existe y agregar dislike
     await db.collection("resenia").updateOne(
       { _id: new ObjectId(reseniaId) },
       {
-        $addToSet: { noMeGusta: new ObjectId(usuarioId) },
-        $pull: { meGusta: new ObjectId(usuarioId) }
+        $addToSet: { noMeGusta: usuarioId },
+        $pull: { meGusta: usuarioId }
       }
     );
+
+    // Recalcular estadísticas del título
+    await this._actualizarEstadisticasTitulo(resenia.tituloId);
+
+    return { success: true };
+  }
+
+  // metodo privado para actualizar estadísticas
+  static async _actualizarEstadisticasTitulo(tituloId) {
+    const db = getDB();
   
-    return { success: true, action: "dislike" };
+    // Todas las reseñas del título
+    const reseñas = await db
+      .collection("resenia")
+      .find({ tituloId: new ObjectId(tituloId) })
+      .toArray();
+  
+    if (!reseñas.length) return;
+  
+    const totalResenas = reseñas.length;
+    const promedioCalificacion =
+      reseñas.reduce((sum, r) => sum + (r.calificacion || 0), 0) / totalResenas;
+  
+    const meGusta = reseñas.reduce((sum, r) => sum + (r.meGusta?.length || 0), 0);
+    const noMeGusta = reseñas.reduce((sum, r) => sum + (r.noMeGusta?.length || 0), 0);
+  
+    // Definir un ranking básico (puedes ajustar la fórmula)
+    const ranking = (promedioCalificacion * 2) + (meGusta - noMeGusta);
+  
+    await db.collection("titulos").updateOne(
+      { _id: new ObjectId(tituloId) },
+      {
+        $set: {
+          "estadisticas.promedioCalificacion": new Double(promedioCalificacion),
+          "estadisticas.meGusta": new Int32(meGusta),
+          "estadisticas.noMeGusta": new Int32(noMeGusta),
+          "estadisticas.totalResenas": new Int32(totalResenas),
+          "estadisticas.ranking": new Double(ranking)
+        }
+      }
+    );
   }
   
 }
