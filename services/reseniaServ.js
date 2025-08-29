@@ -156,4 +156,45 @@ export class ServicioResenias {
     return { success: true };
   }
   
+  static async likeResenia(reseniaId, usuarioId) {
+    if (!ObjectId.isValid(reseniaId)) throw new Error("ID de reseña inválido");
+  
+    const db = getDB();
+  
+    // Asegurar que la reseña existe
+    const reseña = await db.collection("resenia").findOne({ _id: new ObjectId(reseniaId) });
+    if (!reseña) throw new Error("Reseña no encontrada");
+  
+    // Agregar usuario a meGusta, eliminar de noMeGusta
+    await db.collection("resenia").updateOne(
+      { _id: new ObjectId(reseniaId) },
+      {
+        $addToSet: { meGusta: new ObjectId(usuarioId) }, // evita duplicados
+        $pull: { noMeGusta: new ObjectId(usuarioId) }
+      }
+    );
+  
+    return { success: true, action: "like" };
+  }
+  
+  static async dislikeResenia(reseniaId, usuarioId) {
+    if (!ObjectId.isValid(reseniaId)) throw new Error("ID de reseña inválido");
+  
+    const db = getDB();
+  
+    const reseña = await db.collection("resenia").findOne({ _id: new ObjectId(reseniaId) });
+    if (!reseña) throw new Error("Reseña no encontrada");
+  
+    // Agregar usuario a noMeGusta, eliminar de meGusta
+    await db.collection("resenia").updateOne(
+      { _id: new ObjectId(reseniaId) },
+      {
+        $addToSet: { noMeGusta: new ObjectId(usuarioId) },
+        $pull: { meGusta: new ObjectId(usuarioId) }
+      }
+    );
+  
+    return { success: true, action: "dislike" };
+  }
+  
 }

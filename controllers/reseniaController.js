@@ -38,3 +38,27 @@ export const eliminarReseniaCtrl = async (req, res) => {
     return errorResponse(res, "Error interno del servidor", 500);
   }
 };
+
+export const likeReseniaCtrl = async (req, res) => {
+  try {
+    const resultado = await ServicioResenias.likeResenia(
+      req.params.id,
+      new ObjectId(req.user._id)
+    );
+    return exitosoResponse(res, resultado, "Like registrado");
+  } catch (error) {
+    return errorResponse(res, error.message, 400);
+  }
+};
+
+export const dislikeReseniaCtrl = async (req, res) => {
+  try {
+    const resultado = await ServicioResenias.dislikeResenia(
+      req.params.id,
+      new ObjectId(req.user._id)
+    );
+    return exitosoResponse(res, resultado, "Dislike registrado");
+  } catch (error) {
+    return errorResponse(res, error.message, 400);
+  }
+};
