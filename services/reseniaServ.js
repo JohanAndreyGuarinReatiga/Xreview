@@ -1,6 +1,7 @@
 import { getDB } from "../config/configdb.js";
 import { Resenia } from "../models/Resenia.js";
 import { ObjectId } from "mongodb";
+import { Int32, Double } from "mongodb"; 
 
 export class ServicioResenias {
   static async crearResenia(data) {
@@ -10,7 +11,6 @@ export class ServicioResenias {
 
     // Conversión estricta de ObjectId
     data.tituloId = new ObjectId(data.tituloId);
-    data.usuarioId = new ObjectId(data.usuarioId);
 
     // Asegurar arrays
     data.meGusta = Array.isArray(data.meGusta)
@@ -74,7 +74,7 @@ export class ServicioResenias {
     const _id = new ObjectId(reseniaId);
   
     // Buscar reseña del usuario
-    const reseniaExistente = await coleccion.findOne({ _id, usuarioId });
+    const reseniaExistente = await coleccion.findOne({ _id, usuarioId: new ObjectId(usuarioId) });
     if (!reseniaExistente) {
       throw new Error("Reseña no encontrada o no tienes permisos");
     }
@@ -119,5 +119,122 @@ export class ServicioResenias {
     return await coleccion.findOne({ _id });
   }
   
-    
+  static async eliminarResenia(reseniaId, rolUsuario, usuarioId) {
+    if (!ObjectId.isValid(reseniaId)) {
+      throw new Error("ID de reseña inválido");
+    }
+    const db = getDB();
+    const reseña = await db.collection("resenia").findOne({ _id: new ObjectId(reseniaId) });
+    if (!reseña) throw new Error("Reseña no encontrada");
+    if (reseña.usuarioId.toString() !== usuarioId.toString() && rolUsuario !== "administrador") {
+      throw new Error("No tienes permisos para eliminar esta reseña");
+    }
+    await db.collection("resenia").deleteOne({ _id: new ObjectId(reseniaId) });
+  
+    // Recalcular estadísticas del título
+    const tituloId = reseña.tituloId; 
+    const resenasRestantes = await db.collection("resenia").find({ tituloId }).toArray();
+  
+    let promedio = 0, meGusta = 0, noMeGusta = 0;
+    if (resenasRestantes.length > 0) {
+      promedio = resenasRestantes.reduce((acc, r) => acc + (r.calificacion || 0), 0) / resenasRestantes.length;
+      meGusta = resenasRestantes.filter(r => r.meGusta === true).length;
+      noMeGusta = resenasRestantes.filter(r => r.noMeGusta === true).length;
+    }
+  
+    await db.collection("titulo").updateOne(
+      { _id: new ObjectId(tituloId) },
+      {
+        $set: {
+          "estadisticas.promedioCalificacion": promedio,
+          "estadisticas.meGusta": meGusta,
+          "estadisticas.noMeGusta": noMeGusta,
+          "estadisticas.totalResenas": resenasRestantes.length
+        }
+      }
+    );
+  
+    return { success: true };
+  }
+
+ static async likeResenia(reseniaId, usuarioId) {
+    if (!ObjectId.isValid(reseniaId)) throw new Error("ID inválido");
+
+    const db = getDB();
+    const resenia = await db.collection("resenia").findOne({ _id: new ObjectId(reseniaId) });
+    if (!resenia) throw new Error("Reseña no encontrada");
+
+    // Remover dislike si existe y agregar like
+    await db.collection("resenia").updateOne(
+      { _id: new ObjectId(reseniaId) },
+      {
+        $addToSet: { meGusta: usuarioId },
+        $pull: { noMeGusta: usuarioId }
+      }
+    );
+
+    // Recalcular estadísticas del título
+    await this._actualizarEstadisticasTitulo(resenia.tituloId);
+
+    return { success: true };
+  }
+
+  static async dislikeResenia(reseniaId, usuarioId) {
+    if (!ObjectId.isValid(reseniaId)) throw new Error("ID inválido");
+
+    const db = getDB();
+    const resenia = await db.collection("resenia").findOne({ _id: new ObjectId(reseniaId) });
+    if (!resenia) throw new Error("Reseña no encontrada");
+
+    // Remover like si existe y agregar dislike
+    await db.collection("resenia").updateOne(
+      { _id: new ObjectId(reseniaId) },
+      {
+        $addToSet: { noMeGusta: usuarioId },
+        $pull: { meGusta: usuarioId }
+      }
+    );
+
+    // Recalcular estadísticas del título
+    await this._actualizarEstadisticasTitulo(resenia.tituloId);
+
+    return { success: true };
+  }
+
+  // metodo privado para actualizar estadísticas
+  static async _actualizarEstadisticasTitulo(tituloId) {
+    const db = getDB();
+  
+    // Todas las reseñas del título
+    const reseñas = await db
+      .collection("resenia")
+      .find({ tituloId: new ObjectId(tituloId) })
+      .toArray();
+  
+    if (!reseñas.length) return;
+  
+    const totalResenas = reseñas.length;
+    const promedioCalificacion =
+      reseñas.reduce((sum, r) => sum + (r.calificacion || 0), 0) / totalResenas;
+  
+    const meGusta = reseñas.reduce((sum, r) => sum + (r.meGusta?.length || 0), 0);
+    const noMeGusta = reseñas.reduce((sum, r) => sum + (r.noMeGusta?.length || 0), 0);
+  
+    // Definir un ranking básico (puedes ajustar la fórmula)
+    const ranking = (promedioCalificacion * 2) + (meGusta - noMeGusta);
+  
+    await db.collection("titulos").updateOne(
+      { _id: new ObjectId(tituloId) },
+      {
+        $set: {
+          "estadisticas.promedioCalificacion": new Double(promedioCalificacion),
+          "estadisticas.meGusta": new Int32(meGusta),
+          "estadisticas.noMeGusta": new Int32(noMeGusta),
+          "estadisticas.totalResenas": new Int32(totalResenas),
+          "estadisticas.ranking": new Double(ranking)
+        }
+      }
+    );
+  }
+  
 }
