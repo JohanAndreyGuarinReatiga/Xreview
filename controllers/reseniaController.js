@@ -23,3 +23,18 @@ export const editarReseniaCtrl = async (req, res) => {
     return errorResponse(res, error, 400);
   }
 };
+
+export const eliminarReseniaCtrl = async (req, res) => {
+  try {
+    const resultado = await ServicioResenias.eliminarResenia(
+      req.params.id,
+      req.user.rol,
+      new ObjectId(req.user._id)
+    );   
+
+    return exitosoResponse(res, resultado, "Reseña eliminada");
+  } catch (error) {
+    // console.error("Error al eliminar reseña:", error); //  ver error exacto
+    return errorResponse(res, "Error interno del servidor", 500);
+  }
+};

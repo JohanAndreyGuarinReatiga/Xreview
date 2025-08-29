@@ -118,5 +118,42 @@ export class ServicioResenias {
     return await coleccion.findOne({ _id });
   }
   
-    
+  static async eliminarResenia(reseniaId, rolUsuario, usuarioId) {
+    if (!ObjectId.isValid(reseniaId)) {
+      throw new Error("ID de reseña inválido");
+    }
+    const db = getDB();
+    const reseña = await db.collection("resenia").findOne({ _id: new ObjectId(reseniaId) });
+    if (!reseña) throw new Error("Reseña no encontrada");
+    if (reseña.usuarioId.toString() !== usuarioId.toString() && rolUsuario !== "administrador") {
+      throw new Error("No tienes permisos para eliminar esta reseña");
+    }
+    await db.collection("resenia").deleteOne({ _id: new ObjectId(reseniaId) });
+  
+    // Recalcular estadísticas del título
+    const tituloId = reseña.tituloId; 
+    const resenasRestantes = await db.collection("resenia").find({ tituloId }).toArray();
+  
+    let promedio = 0, meGusta = 0, noMeGusta = 0;
+    if (resenasRestantes.length > 0) {
+      promedio = resenasRestantes.reduce((acc, r) => acc + (r.calificacion || 0), 0) / resenasRestantes.length;
+      meGusta = resenasRestantes.filter(r => r.meGusta === true).length;
+      noMeGusta = resenasRestantes.filter(r => r.noMeGusta === true).length;
+    }
+  
+    await db.collection("titulo").updateOne(
+      { _id: new ObjectId(tituloId) },
+      {
+        $set: {
+          "estadisticas.promedioCalificacion": promedio,
+          "estadisticas.meGusta": meGusta,
+          "estadisticas.noMeGusta": noMeGusta,
+          "estadisticas.totalResenas": resenasRestantes.length
+        }
+      }
+    );
+  
+    return { success: true };
+  }
+  
 }
