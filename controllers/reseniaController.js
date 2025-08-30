@@ -62,3 +62,12 @@ export const dislikeReseniaCtrl = async (req, res) => {
     return errorResponse(res, error.message, 400);
   }
 };
+
+export const listarReseniasCtrl = async (req, res) => {
+  try {
+    const resenias = await ServicioResenias.listarResenias();
+    return exitosoResponse(res, resenias, "Lista de reseñas");
+  } catch (error) {
+    return errorResponse(res, error, 400);
+  }
+};

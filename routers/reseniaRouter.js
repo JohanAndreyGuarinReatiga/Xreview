@@ -1,6 +1,6 @@
 import { Router } from "express";
 import passport from "passport";
-import { crearReseniaCtrl, editarReseniaCtrl, eliminarReseniaCtrl, likeReseniaCtrl, dislikeReseniaCtrl  } from "../controllers/reseniaController.js";
+import { crearReseniaCtrl, editarReseniaCtrl, eliminarReseniaCtrl, likeReseniaCtrl, dislikeReseniaCtrl, listarReseniasCtrl  } from "../controllers/reseniaController.js";
 
 const router = Router()
 
@@ -14,5 +14,7 @@ router.delete("/eliminar/:id", passport.authenticate("jwt", { session: false }),
 router.post("/like/:id", passport.authenticate("jwt", { session: false }), likeReseniaCtrl);
   
 router.post("/dislike/:id", passport.authenticate("jwt", { session: false }), dislikeReseniaCtrl);
+
+router.get("/", passport.authenticate("jwt", { session: false }), listarReseniasCtrl);
   
 export default router;

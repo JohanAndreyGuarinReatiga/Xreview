@@ -236,5 +236,9 @@ export class ServicioResenias {
       }
     );
   }
-  
+
+  static async listarResenias() {
+    const resenias = await getDB().collection("resenia").find().toArray();
+    return resenias;
+  }
 }
