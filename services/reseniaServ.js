@@ -238,7 +238,20 @@ export class ServicioResenias {
   }
 
   static async listarResenias() {
-    const resenias = await getDB().collection("resenia").find().toArray();
+    const db = getDB();
+  
+    const resenias = await db.collection("resenia").aggregate([
+      {
+        $lookup: {
+          from: "usuarios",
+          localField: "usuarioId",
+          foreignField: "_id",
+          as: "usuario"
+        }
+      },
+      { $unwind: "$usuario" }
+    ]).toArray();
+  
     return resenias;
   }
 }
