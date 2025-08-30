@@ -43,7 +43,7 @@ router.delete(
   eliminarUsuario
 );
 
-// Editar usuario (propio o admin)
+// Editar usuario (admin)
 router.put(
   "/editar/:id",
   passport.authenticate("jwt", { session: false }),
