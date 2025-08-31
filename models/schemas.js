@@ -68,7 +68,7 @@ export default {
           description: "Categoria del título",
         },
         anio: {
-          bsonType: "int",
+          bsonType: "number",
           minimum: 1800,
           description: "Año de estreno",
         },
@@ -82,17 +82,18 @@ export default {
           description: "Indica si un administrador aprobó la obra",
         },
         creadoPor: {
-          bsonType: "objectId",
+          bsonType: ["objectId", "string"],
           description: "ID del usuario o administrador que creó el título",
         },
         estadisticas: {
           bsonType: "object",
           properties: {
-            promedioCalificacion: { bsonType: "double" },
-            meGusta: { bsonType: "int", minimum: 0 },
-            noMeGusta: { bsonType: "int", minimum: 0 },
-            totalResenas: { bsonType: "int", minimum: 0 },
-            ranking: { bsonType: "double" },
+            promedioCalificacion: { bsonType: "number", description: "Promedio de calificaciones del 1 al 10" },
+            sumaCalificaciones: { bsonType: "int", minimum: 0 },
+            meGusta: { bsonType: "int", minimum: 0, description: "Likes totales recibidos en reseñas" },
+            noMeGusta: { bsonType: "int", minimum: 0, description: "Dislikes totales recibidos en reseñas" },
+            totalResenas: { bsonType: "int", minimum: 0, description: "Cantidad de reseñas registradas" },
+            ranking: { bsonType: "number", description: "Ranking ponderado calculado automáticamente" },
           },
         },
       },
