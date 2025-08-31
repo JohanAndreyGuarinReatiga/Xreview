@@ -88,11 +88,12 @@ export default {
         estadisticas: {
           bsonType: "object",
           properties: {
-            promedioCalificacion: { bsonType: "number" },
-            meGusta: { bsonType: "int", minimum: 0 },
-            noMeGusta: { bsonType: "int", minimum: 0 },
-            totalResenas: { bsonType: "int", minimum: 0 },
-            ranking: { bsonType: "number" },
+            promedioCalificacion: { bsonType: "number", description: "Promedio de calificaciones del 1 al 10" },
+            sumaCalificaciones: { bsonType: "int", minimum: 0 },
+            meGusta: { bsonType: "int", minimum: 0, description: "Likes totales recibidos en reseñas" },
+            noMeGusta: { bsonType: "int", minimum: 0, description: "Dislikes totales recibidos en reseñas" },
+            totalResenas: { bsonType: "int", minimum: 0, description: "Cantidad de reseñas registradas" },
+            ranking: { bsonType: "number", description: "Ranking ponderado calculado automáticamente" },
           },
         },
       },

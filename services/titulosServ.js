@@ -166,53 +166,145 @@ export class tituloServicio {
   //logica de estadisticas//
 
   async meGusta(id) {
+    const titulo = await this.collection().findOne({ _id: new ObjectId(id) });
+    if (!titulo) throw new Error("Titulo no encontrado");
+
+    const meGusta = (titulo.estadisticas.meGusta || 0) + 1;
+    const noMeGusta = titulo.estadisticas.noMeGusta || 0;
+    const promedio = titulo.estadisticas.promedioCalificacion || 0;
+
+    const nuevoRanking = promedio + meGusta * 0.2 - noMeGusta * 0.1;
+
     const res = await this.collection().updateOne(
       { _id: new ObjectId(id) },
-      { $inc: { "estadisticas.meGusta": 1 } }
+      {
+        $set: {
+          "estadisticas.meGusta": meGusta,
+          "estadisticas.ranking": nuevoRanking,
+        },
+      }
     );
+
     if (res.matchedCount === 0) throw new Error("Titulo no encontrado");
     return { mensaje: "Me gusta agregado" };
   }
 
   async noMeGusta(id) {
+    const titulo = await this.collection().findOne({ _id: new ObjectId(id) });
+    if (!titulo) throw new Error("Titulo no encontrado");
+
+    const meGusta = titulo.estadisticas.meGusta || 0;
+    const noMeGusta = (titulo.estadisticas.noMeGusta || 0) + 1;
+    const promedio = titulo.estadisticas.promedioCalificacion || 0;
+
+    const nuevoRanking = promedio + meGusta * 0.2 - noMeGusta * 0.1;
+
     const res = await this.collection().updateOne(
       { _id: new ObjectId(id) },
-      { $inc: { "estadisticas.noMeGusta": 1 } }
+      {
+        $set: {
+          "estadisticas.noMeGusta": noMeGusta,
+          "estadisticas.ranking": nuevoRanking,
+        },
+      }
     );
+
     if (res.matchedCount === 0) throw new Error("Titulo no encontrado");
     return { mensaje: "No me gusta agregado" };
   }
 
   async calificar(id, calificacion) {
+    const titulo = await this.collection().findOne({ _id: new ObjectId(id) });
+    if (!titulo) throw new Error("Titulo no encontrado");
+
+    // Valores actuales
+    const sumaActual = titulo.estadisticas.sumaCalificaciones || 0;
+    const totalActual = titulo.estadisticas.totalResenas || 0;
+    const meGusta = titulo.estadisticas.meGusta || 0;
+    const noMeGusta = titulo.estadisticas.noMeGusta || 0;
+
+    // Nuevos valores
+    const nuevaSuma = sumaActual + calificacion;
+    const nuevoTotal = totalActual + 1;
+    const nuevoPromedio = nuevaSuma / nuevoTotal;
+
+    // Ranking (puedes ajustar fórmula)
+    const nuevoRanking = nuevoPromedio + meGusta * 0.2 - noMeGusta * 0.1;
+
+    // Actualizar documento
     const res = await this.collection().updateOne(
       { _id: new ObjectId(id) },
       {
-        $inc: { "estadisticas.totalResenas": 1 },
-        $set: { "estadisticas.promedioCalificacion": calificacion },
+        $set: {
+          "estadisticas.sumaCalificaciones": nuevaSuma,
+          "estadisticas.totalResenas": nuevoTotal,
+          "estadisticas.promedioCalificacion": nuevoPromedio,
+          "estadisticas.ranking": nuevoRanking,
+        },
       }
     );
+
     if (res.matchedCount === 0) throw new Error("Titulo no encontrado");
-    return { mensaje: "Calificacion agregada" };
+    return { mensaje: "Calificación agregada con éxito" };
   }
 
   async quitarLike(id) {
-    const res = await this.collection().updateOne(
-      { _id: new ObjectId(id), "estadisticas.meGusta": { $gt: 0 } },
-      { $inc: { "estadisticas.meGusta": -1 } }
-    );
+  const titulo = await this.collection().findOne({ _id: new ObjectId(id) });
+  if (!titulo) throw new Error("Titulo no encontrado");
 
-    if (res.matchedCount === 0)
-      throw new Error("TItulo no encontrado o sin likes");
-    return { mensaje: "Me gusta quitado" };
+  if ((titulo.estadisticas.meGusta || 0) <= 0) {
+    throw new Error("El título no tiene likes para quitar");
+  }
+
+  const meGusta = titulo.estadisticas.meGusta - 1;
+  const noMeGusta = titulo.estadisticas.noMeGusta || 0;
+  const promedio = titulo.estadisticas.promedioCalificacion || 0;
+
+  const nuevoRanking = promedio + (meGusta * 0.2) - (noMeGusta * 0.1);
+
+  const res = await this.collection().updateOne(
+    { _id: new ObjectId(id) },
+    {
+      $set: {
+        "estadisticas.meGusta": meGusta,
+        "estadisticas.ranking": nuevoRanking,
+      },
+    }
+  );
+
+  if (res.matchedCount === 0)
+    throw new Error("Título no encontrado o sin likes");
+
+  return { mensaje: "Me gusta quitado" };
   }
 
   async quitarNoMeGusta(id) {
-    const res = await this.collection().updateOne(
-      { _id: new ObjectId(id), "estadisticas.noMeGusta": { $gt: 0 } },
-      { $inc: { "estadisticas.noMeGusta": -1 } }
-    );
-    if (res.matchedCount === 0)
-      throw new Error("Titulo no encontrado o sin dislikes");
-    return { mensaje: "No me gusta quitado" };
+    const titulo = await this.collection().findOne({ _id: new ObjectId(id) });
+  if (!titulo) throw new Error("Titulo no encontrado");
+
+  if ((titulo.estadisticas.noMeGusta || 0) <= 0) {
+    throw new Error("El título no tiene dislikes para quitar");
+  }
+
+  const meGusta = titulo.estadisticas.meGusta || 0;
+  const noMeGusta = titulo.estadisticas.noMeGusta - 1;
+  const promedio = titulo.estadisticas.promedioCalificacion || 0;
+
+  const nuevoRanking = promedio + (meGusta * 0.2) - (noMeGusta * 0.1);
+
+  const res = await this.collection().updateOne(
+    { _id: new ObjectId(id) },
+    {
+      $set: {
+        "estadisticas.noMeGusta": noMeGusta,
+        "estadisticas.ranking": nuevoRanking,
+      },
+    }
+  );
+
+  if (res.matchedCount === 0)
+    throw new Error("Título no encontrado o sin dislikes");
+
+  return { mensaje: "No me gusta quitado" };
   }
 }

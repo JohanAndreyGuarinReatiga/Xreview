@@ -24,10 +24,9 @@ import { esAdmin } from "../middlewares/roles.js";
 
 const router = Router();
 
-// rutas publicas
-router.get("/buscar/:titulo",passport.authenticate("jwt", { session: false }), obtenerTitulo); // buscar por nombre exacto (si) ✅
 
 //rutas protegidas(necesita estar logueado)
+router.get("/buscar/:titulo",passport.authenticate("jwt", { session: false }), obtenerTitulo); // buscar por nombre exacto (si) ✅
 router.get("/listar",passport.authenticate("jwt", { session: false }), listarTitulos); // listar títulos (solo aprobados si es usuario normal) (si) 
 router.get("/filtros",passport.authenticate("jwt", { session: false }),listarConFiltros); // filtros dinámicos (si) ✅
 router.get("/paginado",passport.authenticate("jwt", { session: false }),listarTituloPaginado ); // paginado
@@ -36,10 +35,10 @@ router.get("/top",passport.authenticate("jwt", { session: false }),topRanking); 
 router.get("/masGustados",passport.authenticate("jwt", { session: false }),masMeGustas); // más gustados
 router.get("/personalList/:usuarioId",passport.authenticate("jwt", { session: false }),listaDeUsuario) // títulos de un usuario
 router.post("/crear",passport.authenticate("jwt", { session: false }), upload.single("imagen"),crearTitulo); // crear un nuevo titulo
-router.post("/:id/like",passport.authenticate("jwt", { session: false }),darMeGusta) // dar me gusta
-router.post("/:id/dislike",passport.authenticate("jwt", { session: false }),darNoMeGusta) //dar no me gusta 
 router.post("/:id/calificar",passport.authenticate("jwt", { session: false }),calificarTitulo) // calificar titulo
+router.post("/:id/like",passport.authenticate("jwt", { session: false }),darMeGusta) // dar me gusta
 router.delete("/:id/quitarlike",passport.authenticate("jwt", { session: false }),deshacerlike)
+router.post("/:id/dislike",passport.authenticate("jwt", { session: false }),darNoMeGusta) //dar no me gusta 
 router.delete("/:id/quitardislike",passport.authenticate("jwt", { session: false }),deshacerDislike)
 
 //Rutas de solo admin

@@ -169,7 +169,7 @@ export async function calificarTitulo(req, res) {
 }
 
 export async function deshacerlike(req, res) {
-  try {
+ try {
     const resultado = await servicio.quitarLike(req.params.id);
     res.json(resultado);
   } catch (error) {
