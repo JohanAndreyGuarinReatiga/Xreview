@@ -9,7 +9,6 @@ import {
   aprobarTitulo,
   listarConFiltros,
   listarTituloPaginado,
-  estadisticasActualizadas,
   busquedaTexto,
   topRanking,
   masMeGustas,
@@ -20,22 +19,23 @@ import {
   deshacerlike,
   deshacerDislike,
 } from "../controllers/tituloController.js";
+import { upload } from "../middlewares/upload.js";
 import { esAdmin } from "../middlewares/roles.js";
 
 const router = Router();
 
 // rutas publicas
-router.get("/listar", listarTitulos); // listar títulos (solo aprobados si es usuario normal)
-router.get("/buscar/:titulo", obtenerTitulo); // buscar por nombre exacto
+router.get("/buscar/:titulo",passport.authenticate("jwt", { session: false }), obtenerTitulo); // buscar por nombre exacto (si) ✅
 
 //rutas protegidas(necesita estar logueado)
-router.get("/filtros",passport.authenticate("jwt", { session: false }),listarConFiltros); // filtros dinámicos
+router.get("/listar",passport.authenticate("jwt", { session: false }), listarTitulos); // listar títulos (solo aprobados si es usuario normal) (si) 
+router.get("/filtros",passport.authenticate("jwt", { session: false }),listarConFiltros); // filtros dinámicos (si) ✅
 router.get("/paginado",passport.authenticate("jwt", { session: false }),listarTituloPaginado ); // paginado
-router.get("/buscarTexto",passport.authenticate("jwt", { session: false }), busquedaTexto); // búsqueda por texto
-router.get("/top",passport.authenticate("jwt", { session: false }),topRanking); // top ranking
+router.get("/buscarTexto",passport.authenticate("jwt", { session: false }), busquedaTexto); // búsqueda por texto (no sirve)
+router.get("/top",passport.authenticate("jwt", { session: false }),topRanking); // top ranking 
 router.get("/masGustados",passport.authenticate("jwt", { session: false }),masMeGustas); // más gustados
 router.get("/personalList/:usuarioId",passport.authenticate("jwt", { session: false }),listaDeUsuario) // títulos de un usuario
-router.post("/crear",passport.authenticate("jwt", { session: false }),crearTitulo); // crear un nuevo titulo
+router.post("/crear",passport.authenticate("jwt", { session: false }), upload.single("imagen"),crearTitulo); // crear un nuevo titulo
 router.post("/:id/like",passport.authenticate("jwt", { session: false }),darMeGusta) // dar me gusta
 router.post("/:id/dislike",passport.authenticate("jwt", { session: false }),darNoMeGusta) //dar no me gusta 
 router.post("/:id/calificar",passport.authenticate("jwt", { session: false }),calificarTitulo) // calificar titulo

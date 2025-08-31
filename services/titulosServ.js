@@ -1,28 +1,49 @@
 import { getDB } from "../config/configdb.js";
-import { Titulo } from "../models/titulos.js";
 import { ObjectId } from "mongodb";
+import cloudinary from "../config/cloudinary.js";
+import streamifier from "streamifier";
 
 export class tituloServicio {
   constructor() {
     this.collection = () => getDB().collection("titulos");
   }
 
-  async crearTitulo(datos, usuario) {
-    const existente = await this.collection().findOne({ nombre: datos.nombre });
-    if (existente) {
-      throw new Error("Ya existe un título con ese nombre");
+  async crearTitulo(datos, usuario, file) {
+    let imagenUrl = null;
+
+    // Subir imagen a Cloudinary si hay archivo
+    if (file) {
+      const uploadStream = () =>
+        new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "titulos" },
+            (error, result) => {
+              if (result) resolve(result);
+              else reject(error);
+            }
+          );
+          streamifier.createReadStream(file.buffer).pipe(stream);
+        });
+
+      const result = await uploadStream();
+      imagenUrl = result.secure_url;
     }
 
     const nuevoTitulo = {
-      ...datos,
-      aprobado: false,
-      creadoPor: usuario._id,
-      fechaCreacion: new Date(),
+      titulo: datos.titulo,
+      tipo: datos.tipo,
+      descripcion: datos.descripcion,
+      categoria: datos.categoria,
+      anio: parseInt(datos.anio, 10),
+      imagenUrl: imagenUrl, // URL de Cloudinary
+      aprobado: false, // por defecto
+      creadoPor: new ObjectId(usuario.id), // usuario autenticado
       estadisticas: {
+        promedioCalificacion: 0,
         meGusta: 0,
         noMeGusta: 0,
-        promedioCalificacion: 0,
         totalResenas: 0,
+        ranking: 0,
       },
     };
 
@@ -30,11 +51,11 @@ export class tituloServicio {
     return { mensaje: "Título creado exitosamente", id: res.insertedId };
   }
 
-  async listar() {
+  async listar(usuario) {
     let filtro = { aprobado: true };
 
-    if (usuarioAutenticado?.rol === "administrador") {
-      filtro = {};
+    if (usuario?.rol === "administrador") {
+      filtro = {}; // El admin ve todos
     }
 
     return await this.collection().find(filtro).toArray();

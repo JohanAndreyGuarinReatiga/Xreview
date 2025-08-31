@@ -1,19 +1,26 @@
-import { query } from "express-validator";
 import { tituloServicio } from "../services/titulosServ.js";
 
 const servicio = new tituloServicio();
 
-export async function crearTitulo(req, res) {
-  try {
-    const resultado = await servicio.crearTitulo({
-      ...req.body,
-      creadoPor: req.user.id,
-    });
-    res.status(201).json({ resultado });
+export const crearTitulo = async (req, res) => {
+    try {
+    const { titulo, tipo, descripcion, categoria, anio } = req.body;
+
+    // Asegurar que año sea número
+    const anioNumber = parseInt(anio, 10);
+
+    const nuevoTitulo = await servicio.crearTitulo(
+      { titulo, tipo, descripcion, categoria, anio: anioNumber },
+      req.user,   // usuario autenticado
+      req.file    // archivo subido
+    );
+
+    res.status(201).json(nuevoTitulo);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error("❌ Error en controller:", error);
+    res.status(500).json({ error: "Error al crear el título" });
   }
-}
+};
 
 export async function listarTitulos(req, res) {
   try {
@@ -27,7 +34,6 @@ export async function listarTitulos(req, res) {
 export async function obtenerTitulo(req, res) {
   try {
     const { titulo } = req.params;
-    const servicio = new tituloServicio();
     const resultado = await servicio.buscarPorNombre(titulo);
     res.json(resultado);
   } catch (error) {
@@ -73,7 +79,7 @@ export async function listarConFiltros(req, res) {
 
 export async function listarTituloPaginado(req, res) {
   try {
-    const { page, limit, sortBy, order } = query;
+    const { page, limit, sortBy, order } = req.query;
     const resultado = await servicio.listarPaginado({
       page: parseInt(page) || 1,
       limit: parseInt(limit) || 10,
@@ -109,7 +115,7 @@ export async function topRanking(req, res) {
 export async function masMeGustas(req, res) {
   try {
     const resultado = await servicio.listarMasGustados(
-      parseInt(req, query.limit) || 10
+      parseInt(req.query.limit) || 10
     );
     res.json(resultado);
   } catch (error) {
@@ -126,7 +132,10 @@ export async function listaDeUsuario(req, res) {
   }
 }
 
-//logica de estadisticas//
+
+
+// ----------- lógica de estadísticas ----------- //
+
 export async function darMeGusta(req, res) {
   try {
     const resultado = await servicio.meGusta(req.params.id);
@@ -148,14 +157,8 @@ export async function darNoMeGusta(req, res) {
 export async function calificarTitulo(req, res) {
   try {
     const { calificacion } = req.body;
-    if (
-      !typeof calificacion !== "number" ||
-      calificacion < 1 ||
-      calificacion > 10
-    ) {
-      return res
-        .status(400)
-        .json({ error: "La calificacion debe estar entre 1 y 10" });
+    if (typeof calificacion !== "number" || calificacion < 1 || calificacion > 10) {
+      return res.status(400).json({ error: "La calificación debe estar entre 1 y 10" });
     }
 
     const resultado = await servicio.calificar(req.params.id, calificacion);
