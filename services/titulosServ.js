@@ -73,22 +73,26 @@ export class tituloServicio {
   }
 
   async editar(id, datos, usuarioAutenticado) {
-    if (
-      usuarioAutenticado.rol !== "administrador" &&
-      (!datos.creadoPor || usuarioAutenticado.id !== datos.creadoPor.toString())
-    ) {
-      throw new Error("No tienes permiso para editar este titulo");
-    }
-
-    const res = await this.collection().updateOne(
-      { _id: new ObjectId(id) },
-      { $set: datos }
-    );
-
-    if (res.matchedCount === 0) throw new Error("Titulo no encontrado");
-
-    return { mensaje: "Titulo actualizado con exito." };
+  if (!datos || Object.keys(datos).length === 0) {
+    throw new Error("No se enviaron campos para actualizar");
   }
+
+  if (
+    usuarioAutenticado.rol !== "administrador" &&
+    (!datos.creadoPor || usuarioAutenticado.id !== datos.creadoPor.toString())
+  ) {
+    throw new Error("No tienes permiso para editar este titulo");
+  }
+
+  const res = await this.collection().updateOne(
+    { _id: new ObjectId(id) },
+    { $set: datos }
+  );
+
+  if (res.matchedCount === 0) throw new Error("Titulo no encontrado");
+
+  return { mensaje: "Titulo actualizado con exito." };
+}
 
   async eliminar(id, usuarioAutenticado) {
     if (usuarioAutenticado.rol !== "administrador") {
