@@ -53,17 +53,17 @@ export default {
         descripcion: {
           bsonType: "string",
           description: "Resumen de la obra",
-          minLength: 10,
+          minLength: 5,
         },
         categoria: {
           enum: [
-            "Acción",
+            "Accion",
             "Drama",
             "Comedia",
             "Ciencia",
-            "Ficción",
+            "Ficcion",
             "Terror",
-            "Fantasía",
+            "Fantasia",
           ],
           description: "Categoria del título",
         },
@@ -71,11 +71,6 @@ export default {
           bsonType: "number",
           minimum: 1800,
           description: "Año de estreno",
-        },
-        imagenUrl: {
-          bsonType: ["string", "null"],
-          description: "URL de la portada almacenada en Cloudinary",
-          pattern: "^https://res\\.cloudinary\\.com/.+",
         },
         aprobado: {
           bsonType: "bool",

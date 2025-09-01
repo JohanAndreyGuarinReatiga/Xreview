@@ -13,13 +13,7 @@ import {
   topRanking,
   masMeGustas,
   listaDeUsuario,
-  darMeGusta,
-  darNoMeGusta,
-  calificarTitulo,
-  deshacerlike,
-  deshacerDislike,
 } from "../controllers/tituloController.js";
-import { upload } from "../middlewares/upload.js";
 import { esAdmin } from "../middlewares/roles.js";
 
 const router = Router();
@@ -34,12 +28,7 @@ router.get("/buscarTexto",passport.authenticate("jwt", { session: false }), busq
 router.get("/top",passport.authenticate("jwt", { session: false }),topRanking); // top ranking 
 router.get("/masGustados",passport.authenticate("jwt", { session: false }),masMeGustas); // más gustados
 router.get("/personalList/:usuarioId",passport.authenticate("jwt", { session: false }),listaDeUsuario) // títulos de un usuario
-router.post("/crear",passport.authenticate("jwt", { session: false }), upload.single("imagen"),crearTitulo); // crear un nuevo titulo
-router.post("/:id/calificar",passport.authenticate("jwt", { session: false }),calificarTitulo) // calificar titulo
-router.post("/:id/like",passport.authenticate("jwt", { session: false }),darMeGusta) // dar me gusta
-router.delete("/:id/quitarlike",passport.authenticate("jwt", { session: false }),deshacerlike)
-router.post("/:id/dislike",passport.authenticate("jwt", { session: false }),darNoMeGusta) //dar no me gusta 
-router.delete("/:id/quitardislike",passport.authenticate("jwt", { session: false }),deshacerDislike)
+router.post("/crear",passport.authenticate("jwt", { session: false }), crearTitulo); // crear un nuevo titulo
 
 //Rutas de solo admin
 router.put("/editar/:id",passport.authenticate("jwt", { session: false }),esAdmin,editarTitulo); //editar titulo(solo admin)

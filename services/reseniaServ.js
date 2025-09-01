@@ -203,38 +203,40 @@ export class ServicioResenias {
 
   // metodo privado para actualizar estadísticas
   static async _actualizarEstadisticasTitulo(tituloId) {
-    const db = getDB();
-  
-    // Todas las reseñas del título
-    const reseñas = await db
-      .collection("resenia")
-      .find({ tituloId: new ObjectId(tituloId) })
-      .toArray();
-  
-    if (!reseñas.length) return;
-  
-    const totalResenas = reseñas.length;
-    const promedioCalificacion =
-      reseñas.reduce((sum, r) => sum + (r.calificacion || 0), 0) / totalResenas;
-  
-    const meGusta = reseñas.reduce((sum, r) => sum + (r.meGusta?.length || 0), 0);
-    const noMeGusta = reseñas.reduce((sum, r) => sum + (r.noMeGusta?.length || 0), 0);
-  
-    // Definir un ranking básico (puedes ajustar la fórmula)
-    const ranking = (promedioCalificacion * 2) + (meGusta - noMeGusta);
-  
-    await db.collection("titulos").updateOne(
-      { _id: new ObjectId(tituloId) },
-      {
-        $set: {
-          "estadisticas.promedioCalificacion": new Double(promedioCalificacion),
-          "estadisticas.meGusta": new Int32(meGusta),
-          "estadisticas.noMeGusta": new Int32(noMeGusta),
-          "estadisticas.totalResenas": new Int32(totalResenas),
-          "estadisticas.ranking": new Double(ranking)
-        }
+  const db = getDB();
+
+  // Todas las reseñas del título
+  const reseñas = await db
+    .collection("resenia")
+    .find({ tituloId: new ObjectId(tituloId) })
+    .toArray();
+
+  if (!reseñas.length) return;
+
+  const totalResenas = reseñas.length;
+
+  // Calculos
+  const sumaCalificaciones = reseñas.reduce((sum, r) => sum + (r.calificacion || 0), 0);
+  const promedioCalificacion = sumaCalificaciones / totalResenas;
+  const meGusta = reseñas.reduce((sum, r) => sum + (r.meGusta?.length || 0), 0);
+  const noMeGusta = reseñas.reduce((sum, r) => sum + (r.noMeGusta?.length || 0), 0);
+
+  // Definir un ranking básico (puedes ajustar la fórmula)
+  const ranking = (promedioCalificacion * 2) + (meGusta - noMeGusta);
+
+  await db.collection("titulos").updateOne(
+    { _id: new ObjectId(tituloId) },
+    {
+      $set: {
+        "estadisticas.promedioCalificacion": new Double(promedioCalificacion),
+        "estadisticas.sumaCalificaciones": new Int32(sumaCalificaciones),
+        "estadisticas.meGusta": new Int32(meGusta),
+        "estadisticas.noMeGusta": new Int32(noMeGusta),
+        "estadisticas.totalResenas": new Int32(totalResenas),
+        "estadisticas.ranking": new Double(ranking)
       }
-    );
+    }
+  );
   }
 
   static async listarResenias() {

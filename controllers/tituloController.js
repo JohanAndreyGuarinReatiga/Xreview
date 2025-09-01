@@ -3,16 +3,18 @@ import { tituloServicio } from "../services/titulosServ.js";
 const servicio = new tituloServicio();
 
 export const crearTitulo = async (req, res) => {
-    try {
+  try {
     const { titulo, tipo, descripcion, categoria, anio } = req.body;
 
-    // Asegurar que año sea número
-    const anioNumber = parseInt(anio, 10);
+    // Validación mínima
+    if (!titulo || !tipo || !descripcion || !categoria || !anio) {
+      return res.status(400).json({ error: "Todos los campos son obligatorios" });
+    }
 
+    // Crear el título
     const nuevoTitulo = await servicio.crearTitulo(
-      { titulo, tipo, descripcion, categoria, anio: anioNumber },
-      req.user,   // usuario autenticado
-      req.file    // archivo subido
+      { titulo, tipo, descripcion, categoria, anio },
+      req.user // usuario autenticado
     );
 
     res.status(201).json(nuevoTitulo);
@@ -129,59 +131,5 @@ export async function listaDeUsuario(req, res) {
     res.json(resultado);
   } catch (error) {
     res.status(500).json({ error: error.message });
-  }
-}
-
-
-
-// ----------- lógica de estadísticas ----------- //
-
-export async function darMeGusta(req, res) {
-  try {
-    const resultado = await servicio.meGusta(req.params.id);
-    res.json(resultado);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-}
-
-export async function darNoMeGusta(req, res) {
-  try {
-    const resultado = await servicio.noMeGusta(req.params.id);
-    res.json(resultado);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-}
-
-export async function calificarTitulo(req, res) {
-  try {
-    const { calificacion } = req.body;
-    if (typeof calificacion !== "number" || calificacion < 1 || calificacion > 10) {
-      return res.status(400).json({ error: "La calificación debe estar entre 1 y 10" });
-    }
-
-    const resultado = await servicio.calificar(req.params.id, calificacion);
-    res.json(resultado);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-}
-
-export async function deshacerlike(req, res) {
- try {
-    const resultado = await servicio.quitarLike(req.params.id);
-    res.json(resultado);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-}
-
-export async function deshacerDislike(req, res) {
-  try {
-    const resultado = await servicio.quitarNoMeGusta(req.params.id);
-    res.json(resultado);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
   }
 }

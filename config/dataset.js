@@ -33,8 +33,6 @@ async function seed() {
         "Un ladrón que roba secretos corporativos a través de los sueños debe implantar una idea en la mente de un CEO.",
       categoria: "Ficción", 
       anio: new Int32(2010),
-      imagenUrl:
-        "https://res.cloudinary.com/demo/image/upload/v1692999999/inception.jpg",
       aprobado: true,
       creadoPor: new ObjectId("66d07a1f4b2f4d3f9f1a2222"),
       estadisticas: {
@@ -53,8 +51,6 @@ async function seed() {
         "La humanidad lucha por sobrevivir contra gigantes que devoran personas.",
       categoria: "Acción",
       anio: new Int32(2013),
-      imagenUrl:
-        "https://res.cloudinary.com/demo/image/upload/v1692999999/aot.jpg",
       aprobado: true,
       creadoPor: new ObjectId("66d07a1f4b2f4d3f9f1a2222"),
       estadisticas: {
