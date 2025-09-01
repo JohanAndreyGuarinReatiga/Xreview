@@ -4,9 +4,15 @@ import dotenv from "dotenv";
 import { configurePassport } from "./config/passport.js";
 import authRoutes from "./routers/authRoutes.js";
 import usuarioRoutes from "./routers/usuarioRoutes.js";
-import reseniaRouter from "./routers/reseniaRouter.js"
+import reseniaRouter from "./routers/reseniaRouter.js";
 import tituloRouter from "./routers/tituloRoutes.js";
 import cors from "cors";
+import swaggerUi from "swagger-ui-express";
+import { createRequire } from "module";   
+
+// 👇 usar createRequire para poder cargar JSON en ESM
+const require = createRequire(import.meta.url);
+const swaggerFile = require("./swagger-output.json");
 
 dotenv.config();
 
@@ -22,6 +28,9 @@ configurePassport(passport);
 app.use("/v1/auth", authRoutes);
 app.use("/v1/usuarios", usuarioRoutes);
 app.use("/v1/resenias", reseniaRouter);
-app.use("/v1/titulos", tituloRouter)
+app.use("/v1/titulos", tituloRouter);
+
+// Swagger
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 export default app;
