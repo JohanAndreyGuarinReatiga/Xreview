@@ -26,7 +26,7 @@ export const crearTitulo = async (req, res) => {
 
 export async function listarTitulos(req, res) {
   try {
-    const titulos = await servicio.listar(req.user);
+    const titulos = await servicio.listar();
     res.json(titulos);
   } catch (error) {
     res.status(500).json({ error: error.message });

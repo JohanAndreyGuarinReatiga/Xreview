@@ -16,10 +16,10 @@ async function seed() {
     },
     {
       _id: new ObjectId("66d07a1f4b2f4d3f9f1a2222"),
-      email: "admin@example.com",
+      email: "UsuarioPrueba@example.com",
       password: "123",
-      apodo: "AdminMaster",
-      rol: "administrador",
+      apodo: "UsuarioPrueba",
+      rol: "usuario",
     },
   ];
 

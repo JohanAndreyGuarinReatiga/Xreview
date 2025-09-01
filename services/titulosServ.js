@@ -29,14 +29,8 @@ export class tituloServicio {
     return { mensaje: "✅ Título creado exitosamente", id: res.insertedId };
   }
 
-  async listar(usuario) {
-    let filtro = { aprobado: true };
-
-    if (usuario?.rol === "administrador") {
-      filtro = {}; // El admin ve todos
-    }
-
-    return await this.collection().find(filtro).toArray();
+  async listar() {
+    return await this.collection().find({}).toArray();
   }
 
   async buscarPorNombre(titulo) {
