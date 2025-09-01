@@ -105,7 +105,7 @@ El frontend de esta aplicación, desarrollado en HTML, CSS y JavaScript puro, se
 ## 📝 Documentación del Proyecto (SCRUM)
 El desarrollo de este proyecto se llevó a cabo utilizando la metodología SCRUM. La planificación detallada, los roles del equipo, la definición de los sprints y las historias de usuario se encuentran documentadas en el siguiente archivo PDF, adjunto en la raíz de este repositorio:
 
-[nombre_del_documento.pdf]
+[nombre_del_documento.pdf](/Guía_SCRUM_Xreview.docx.pdf)
 
 ## 👥 Créditos
 Este proyecto fue desarrollado por el equipo:
