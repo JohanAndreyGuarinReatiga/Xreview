@@ -110,6 +110,6 @@ El desarrollo de este proyecto se llevó a cabo utilizando la metodología SCRUM
 ## 👥 Créditos
 Este proyecto fue desarrollado por el equipo:
 
-Jose Julian Ortega Navarro - Rol asignado (ej. Scrum Master)
+Jose Julian Ortega Navarro - Rol asignado Scrum Master / developer
 
-Johan Andrey Guarin - Rol asignado (ej. Product Owner)
+Johan Andrey Guarin - Rol asignado Product Owner / developer
