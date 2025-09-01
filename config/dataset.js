@@ -10,14 +10,14 @@ async function seed() {
     {
       _id: new ObjectId("66d07a1f4b2f4d3f9f1a1111"),
       email: "juan@example.com",
-      password: "1234",
+      password: "123",
       apodo: "Juanito",
       rol: "usuario",
     },
     {
       _id: new ObjectId("66d07a1f4b2f4d3f9f1a2222"),
       email: "admin@example.com",
-      password: "1234",
+      password: "123",
       apodo: "AdminMaster",
       rol: "administrador",
     },
@@ -31,12 +31,13 @@ async function seed() {
       tipo: "pelicula",
       descripcion:
         "Un ladrón que roba secretos corporativos a través de los sueños debe implantar una idea en la mente de un CEO.",
-      categoria: "Ficción", 
+      categoria: "Ficcion",
       anio: new Int32(2010),
       aprobado: true,
       creadoPor: new ObjectId("66d07a1f4b2f4d3f9f1a2222"),
       estadisticas: {
         promedioCalificacion: new Double(9.0),
+        sumaCalificaciones: new Int32(27), // 3 reseñas con calificaciones 10+9+8 = 27
         meGusta: new Int32(12),
         noMeGusta: new Int32(1),
         totalResenas: new Int32(3),
@@ -49,12 +50,13 @@ async function seed() {
       tipo: "anime",
       descripcion:
         "La humanidad lucha por sobrevivir contra gigantes que devoran personas.",
-      categoria: "Acción",
+      categoria: "Accion",
       anio: new Int32(2013),
       aprobado: true,
       creadoPor: new ObjectId("66d07a1f4b2f4d3f9f1a2222"),
       estadisticas: {
         promedioCalificacion: new Double(8.8),
+        sumaCalificaciones: new Int32(44), // 5 reseñas promedio 8.8 ≈ 44
         meGusta: new Int32(20),
         noMeGusta: new Int32(2),
         totalResenas: new Int32(5),
