@@ -2,12 +2,14 @@
   "name": "xreview",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "initdb": "node ./config/initDB.js",
-    "start": "node index.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "seed": "node ./config/dataset.js"
   },
   "repository": {
     "type": "git",
@@ -18,12 +20,17 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "express-rate-limit": "^8.0.1",
+    "express-validator": "^7.2.1",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.18.0",
     "passport": "^0.7.0",
-    "passport-jwt": "^4.0.1"
+    "passport-jwt": "^4.0.1",
+    "swagger-autogen": "^2.23.7",
+    "swagger-ui-express": "^5.0.1"
   },
   "bugs": {
     "url": "https://github.com/JohanAndreyGuarinReatiga/Xreview/issues"

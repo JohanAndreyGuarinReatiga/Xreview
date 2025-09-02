@@ -2,21 +2,16 @@ export default {
   usuarios: {
     $jsonSchema: {
       bsonType: "object",
-      required: [
-        "email",
-        "contraseña",
-        "apodo",
-        "rol",
-      ],
+      required: ["email", "password", "apodo", "rol"],
       properties: {
         email: {
           bsonType: "string",
           description: "Correo electrónico del usuario",
           pattern: "^\\S+@\\S+\\.\\S+$",
         },
-        contraseña: {
+        password: {
           bsonType: "string",
-          description: "Contraseña encriptada con bcrypt",
+          description: "password encriptada con bcrypt",
         },
         apodo: {
           bsonType: "string",
@@ -43,7 +38,6 @@ export default {
         "anio",
         "aprobado",
         "creadoPor",
-        "creadoEn",
       ],
       properties: {
         titulo: {
@@ -59,42 +53,42 @@ export default {
         descripcion: {
           bsonType: "string",
           description: "Resumen de la obra",
-          minLength: 10,
+          minLength: 5,
         },
         categoria: {
           enum: [
-            "Acción",
+            "Accion",
             "Drama",
             "Comedia",
             "Ciencia",
-            "Ficción",
+            "Ficcion",
             "Terror",
-            "Fantasía",
+            "Fantasia",
           ],
-          description: "Categoria del titulo",
+          description: "Categoria del título",
         },
         anio: {
-          bsonType: "int",
+          bsonType: "number",
           minimum: 1800,
           description: "Año de estreno",
-        },
-        imagenUrl: {
-          bsonType: ["string", "null"],
-          description: "URL de la portada almacenada en Cloudinary",
-          pattern: "^https://res\\.cloudinary\\.com/.+",
         },
         aprobado: {
           bsonType: "bool",
           description: "Indica si un administrador aprobó la obra",
         },
+        creadoPor: {
+          bsonType: ["objectId", "string"],
+          description: "ID del usuario o administrador que creó el título",
+        },
         estadisticas: {
           bsonType: "object",
           properties: {
-            promedioCalificacion: { bsonType: "double" },
-            meGusta: { bsonType: "int", minimum: 0 },
-            noMeGusta: { bsonType: "int", minimum: 0 },
-            totalResenas: { bsonType: "int", minimum: 0 },
-            ranking: { bsonType: "double" },
+            promedioCalificacion: { bsonType: "number", description: "Promedio de calificaciones del 1 al 10" },
+            sumaCalificaciones: { bsonType: "int", minimum: 0 },
+            meGusta: { bsonType: "int", minimum: 0, description: "Likes totales recibidos en reseñas" },
+            noMeGusta: { bsonType: "int", minimum: 0, description: "Dislikes totales recibidos en reseñas" },
+            totalResenas: { bsonType: "int", minimum: 0, description: "Cantidad de reseñas registradas" },
+            ranking: { bsonType: "number", description: "Ranking ponderado calculado automáticamente" },
           },
         },
       },
