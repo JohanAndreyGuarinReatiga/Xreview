@@ -1,5 +1,5 @@
 import { getDB } from "../config/configdb.js";
-import { Resenia } from "../models/Resenia.js";
+import { Resenia } from "../models/resenia.js";
 import { ObjectId } from "mongodb";
 import { Int32, Double } from "mongodb"; 
 
