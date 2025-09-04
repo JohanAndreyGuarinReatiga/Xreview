@@ -1,5 +1,5 @@
 import { getDB } from "../config/configdb.js";
-import { Resenia } from "../models/Resenia.js";
+import { Resenia } from "../models/resenia.js";
 import { ObjectId } from "mongodb";
 import { Int32, Double } from "mongodb"; 
 
@@ -58,6 +58,8 @@ export class ServicioResenias {
         }
       );
     }
+
+    await this.crearnotificacion(notificaciones.reseniaId)
 
     return { ...data, _id: result.insertedId };
   }
@@ -236,11 +238,11 @@ export class ServicioResenias {
         "estadisticas.ranking": new Double(ranking)
       }
     }
-  );
-  }
+  )
+}
 
-  static async listarResenias() {
-    const db = getDB();
+static async listarResenias() {
+  const db = getDB();
   
     const resenias = await db.collection("resenia").aggregate([
       {
@@ -253,7 +255,24 @@ export class ServicioResenias {
       },
       { $unwind: "$usuario" }
     ]).toArray();
-  
+
     return resenias;
+  }
+  
+//*************Examen**************//
+  static async crearnotificacion(resenia) {
+    const db = getDB();
+    const coleccionNotificaciones = db.colleccion("notificaciones")
+  
+    const NuevaNotificacion = {
+      creadoPor: new ObjectId(usuarioId._id),
+      reseñaCreada: new ObjectId(resenia._id),
+      fechaCreacion: new DateTime(),
+      Estado: false
+    } 
+  
+    const res = await coleccionNotificaciones.insertOne(NuevaNotificacion)
+  
+    return { mensaje: "El usuario agrego una nueva reseña", id: res.insertedId}
   }
 }
